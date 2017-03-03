@@ -1,0 +1,15 @@
+*.swp
+*.aux
+*.nav
+*.out
+*.tex.backup
+*.toc
+*.snm
+*.sty.backup
+*nonpublic*
+documents/*.log
+*.pdf
+km3base/logs/*.log
+# toyExample/output/*
+*/bin/*
+*.o

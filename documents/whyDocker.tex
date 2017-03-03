@@ -1,0 +1,137 @@
+\documentclass[a4paper, twoside, 11pt]{article}
+% deutsche Silbentrennung
+% \usepackage[ngerman]{babel}
+% wegen deutschen Umlauten
+\usepackage[utf8]{inputenc}
+
+\usepackage{a4}
+
+% fuer links im dokument
+\usepackage[colorlinks, linkcolor = black, citecolor = black, filecolor = blue, urlcolor = blue]{hyperref}
+
+% for code examples
+\usepackage{listings}
+% for equations with multiple lines
+\usepackage{amsmath}
+
+% for including graphics
+\usepackage{graphicx}
+% for floatbarriers
+\usepackage{placeins}
+
+\begin{document}
+
+\title{Evaluation of Docker to enhance reproducibility of analyses for ASTERICS}
+\author{Stefan Geißelsöder\\
+ECAP, Erlangen}
+\date{\today}
+\maketitle
+
+\section{Motivation}
+
+As analyses in astronomy, astrophysics and particle astrophysics tend to increase in complexity 
+with the abilities available on modern computer systems, 
+the basic requirement of (short and long term) reproducibility is becoming harder to achieve. 
+The high number of dependencies on other software packages, which have implicitly been used to obtain a result, 
+are non-trivial to be reproduced exactly and sometimes not all dependencies are recognized explicitly. 
+
+Techniques like Docker can help not only to achieve this reproducibility, 
+but also in situations where checks or changes are desired after the know-how is not fully available anymore, 
+e.g. when the original creator has left a collaboration and a new person is to take over this work. 
+
+\section{Considerations that led to Docker}
+
+Why do we recommend Docker instead of another technology for experiments in ASTERICS? 
+Here are a few considerations of alternatives. 
+
+\subsection{Plain scripts}
+
+Just plainly executing custom scripts on a machine in its currently available state 
+risks not to be able to reproduce the computation and results with updated hard/software. 
+
+\subsection{Virtual machines}
+
+In principle virtual machines (VMS) are a reasonable idea to keep analyses reproducible. 
+While there are different competing standards, most of the technologies are compatible with each other. 
+Without additional care, VMs can also decrease the efficiency of computations. 
+As this can be circumvented by some virtual machine techniques, this is not considered a major drawback here though. 
+The main problem is that the memory requirement of VMs doesn't scale well for a large number of analyses, 
+since a whole virtual machine has to be stored for each analysis. 
+
+
+\subsection{Docker}
+
+Docker\footnote{\url{https://www.docker.com/}} is based on layered containerization. It allows direct access 
+to the underlying kernel while abstracting the software dependencies. 
+Since only the changes to a common base system required by an analysis have to be stored, 
+the main drawback of virtual machines in the envisioned application scenario is dealt with, 
+namely the large memory requirements to store analyses. 
+A drawback of the current status of Docker is a so called ``privilege escalation'', 
+which potentially allows users to perform actions on a system they otherwise wouldn't have the rights for. 
+This prevents many clusters from supporting Docker directly, but it is no major concern in our scenario. 
+
+
+\subsection{Singularity}
+
+Singularity\footnote{\url{http://singularity.lbl.gov/about}} is another recent
+option that could help with reproducibility similar to Docker. 
+While it even deals with privilege escalations, 
+so far it is not available on Microsoft Windows operating systems which are used by some members of some collaborations. 
+Furthermore the already established user basis is not as large as Dockers 
+and therefore the risk is higher that it might not be supported 
+in the long run\footnote{Future developments can't be predicted, but a large existing user base tends to be 
+correlated with a longer support and compatibility of following technologies.}. 
+
+
+\subsection{Nix}
+
+Nix\footnote{\url{https://nixos.org/nix}} constitutes a recent development that could be suited to help keeping analyses reproducible. 
+However it focuses on an application and its dependencies. 
+While it offers an elegant way to deal with these dependencies, it does not (and is not intended to) deal with e.g. input files. 
+Furthermore it doesn't support Microsoft Windows and, 
+judging from the current size of the Nix community, is also less widespread than Docker. 
+
+\subsection{Others}
+
+There are many other similar approaches 
+(e.g. Rocket\footnote{\url{https://coreos.com/rkt}}, Flockport\footnote{\url{https://www.flockport.com}}, etc.), 
+but on the one hand, there is no essential feature lacking in Docker that would be required 
+for our use-case. 
+On the other hand, to achieve a long-term reproducibility, which is key to us, 
+a solution should be supported by a large community and as many other cooperations or companies as possible. 
+The current status is that this is fulfilled best by Docker. 
+Furthermore, many alternatives also support Docker images or Dockerfiles, while their extensions usually are incompatible to others. 
+
+\subsection{Summary}
+
+Table \ref{tab:summary} is a summary of the comparison with perceived most relevant disadvantages in red.  
+While it should be clear at this point that there is no single perfect solution, 
+Docker seems to be the best choice as it does solve the problem of reproducibility, 
+is relatively easy to use\footnote{see e.g. ``Using Docker for your analysis in KM3NeT'', Stefan Geißelsöder, 2017}
+and doesn't have major drawbacks as far as the investigated use-case, the reproducibility of analyses, is concerned. 
+
+% \definecolor{darkgreen}{RGB}{20, 110, 20}
+
+\begin{center}
+\begin{tabular}{ l | c | c | c | c | c }
+\label{tab:summary}
+      & Plain 	& VMs 	& Docker 	& Nix 	& Singularity \\
+  \hline
+  Reproducible & \textcolor{red}{Maybe not} 	& Yes 	& Yes		& Yes	& Yes \\
+  \hline
+  All OS & Yes 	& Yes 	& Yes		& \textcolor{red}{No}	& \textcolor{red}{No} \\
+%   \hline
+%   Scope & Application & System & System & Application & System TODO check! \\
+  \hline
+  Widespread & Yes & Yes & Yes & No & No \\
+%   Widespread & Yes & Yes & Yes & \textcolor{red}{No} & \textcolor{red}{No} \\
+  \hline
+  Efficient & Yes & Possible & Yes & Yes & Yes \\
+  \hline
+  Storage required & Low & \textcolor{red}{High} & Moderate & Low & Moderate \\
+%   \hline
+%   Security & - & Enhanced & Decreased & - & - \\
+\end{tabular}
+\end{center}
+
+\end{document}

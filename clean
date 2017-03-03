@@ -1,0 +1,2 @@
+#!/bin/bash
+./cleanContainer.sh && ./cleanImages.sh

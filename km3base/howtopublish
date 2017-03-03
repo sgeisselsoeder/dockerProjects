@@ -1,0 +1,3 @@
+docker login
+docker tag 2bcb447678a6 km3net/km3base:20160824
+docker push km3net/km3base

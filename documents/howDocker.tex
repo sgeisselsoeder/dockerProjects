@@ -1,0 +1,382 @@
+\documentclass[a4paper, twoside, 11pt]{article}
+% deutsche Silbentrennung
+% \usepackage[ngerman]{babel}
+% wegen deutschen Umlauten
+\usepackage[utf8]{inputenc}
+
+\usepackage{a4}
+
+% fuer links im dokument
+\usepackage[colorlinks, linkcolor = black, citecolor = black, filecolor = blue, urlcolor = blue]{hyperref}
+
+% for code examples
+\usepackage{listings}
+% for equations with multiple lines
+\usepackage{amsmath}
+
+% for including graphics
+\usepackage{graphicx}
+% for floatbarriers
+\usepackage{placeins}
+
+\begin{document}
+
+\title{Using Docker for your analysis in KM3NeT}
+\author{Stefan Geißelsöder\\
+ECAP, FAU Erlangen-Nürnberg}
+\date{\today}
+\maketitle
+
+\section{Should you use Docker for your analysis?}
+
+Yes. 
+
+\section{Why?}
+
+Experience tells us that for most analyses at some point in time there 
+is a demand for changes or additional checks. 
+Using Docker will simplify your work in these cases. 
+
+You can be sure that you will be able to repeat the parts 
+of your analysis that are covered by Docker even if the 
+computer/cluster/cloud/whatever you used to obtain your result in the first place 
+has been updated or when the specific machine is not available anymore.
+You can rely on getting the same results, 
+regardless of changes in software versions. 
+Reproducibility is a major benefit of using Docker. 
+
+Another advantage is that it also helps a student or colleague that is to reuse your work. 
+He or she will be able to start where you left of and develop further 
+without first having to worry about the details of how to compile, install or run your work.  
+
+\section{Can you use Docker for your analysis?}
+
+For almost all analyses: yes. \\
+The ideal use case is when your analysis can run on a single computer. 
+Foreseeable complications can be dealt with:
+\begin{itemize}
+ \item If you use many compute nodes e.g. to prefilter data in a customized way, 
+ you can run the evaluation on the prefiltered data with Docker. 
+ Alternatively, if the cluster/cloud you use for filtering also supports Docker, 
+ you could also use a second Docker image for the filtering process. 
+ \item If you require dedicated hardware like GPUs, some additional work is required, 
+ but the general procedure stays the same. 
+ See e.g. \url{https://github.com/NVIDIA/nvidia-docker} for more details on this. 
+\end{itemize}
+
+\section{How can you use Docker?}
+
+We discuss a toy example in C++ on Linux here, 
+but the steps translate to different languages and operating systems. 
+Another example for the already developed multiscale source search 
+analysis\footnote{TODO referenzen, \url{https://github.com/sgeisselsoeder/multiscale}} 
+can be found in the folder where also the toy example is located. 
+This tutorial can be obtained at (TODO url dockerhub/github). 
+As a side remark, even though the example in Section \ref{sec:toyexample} 
+may be sufficient to run your own analysis with docker, 
+please have a look at Section \ref{sec:installSoftware} in the end 
+for a few more, also relevant aspects!
+
+\subsection{Prerequisites}
+\label{sec:isDockerRunning}
+
+This tutorial assumes that you have your input files and your code available and that you have Docker 
+installed\footnote{Information on how to install Docker can be found e.g. at 
+\url{https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04} 
+or \url{https://docs.docker.com/engine/installation/}.} 
+and working. 
+
+You can check if Docker is working correctly by typing ``docker ps'' into your favorite shell. 
+If the output starts similar to ``CONTAINER ID \hspace{0.5cm} IMAGE \hspace{0.5cm} COMMAND``, you are good to go. 
+If it fails, but ''sudo docker ps`` works, your user is not part of the Docker group. 
+You can either prepend sudo to all docker commands or add your user to the Docker group (see install Docker). 
+
+\subsection{A toy example}
+\label{sec:toyexample}
+Everything required for our example is located in the folder toyExample. 
+Within toyExample there is a folder named externalInput which contains the prefiltered input files, 
+a folder named myAnalysis which contains the required source code, Makefiles, scripts, etc., 
+a folder output where the output of the analysis will be stored, 
+a script called runMyAnalysis.sh that will execute the analysis and a file called Dockerfile. 
+
+For a really quick example, execute within the folder toyExample:
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+docker build -t my_analysis:v1 .
+docker run -v `pwd`/output:/myAnalysis/output my_analysis:v1
+\end{lstlisting}
+
+\subsubsection{The Dockerfile}
+\label{sec:dockerfile}
+
+The Dockerfile encapsulates the own analysis software together 
+with all software dependencies, aware or not, 
+including even the basic operating system.
+It is used to create the new Docker image, that executes the analysis. 
+In the example the Dockerfile reads: 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+FROM km3net/km3base:20160909
+MAINTAINER S. Geisselsoeder <stefan.geisselsoeder@fau.de>
+
+COPY myAnalysis /myAnalysis
+COPY externalinput /myAnalysis/input 
+
+RUN make -C /myAnalysis
+COPY runMyAnalysis.sh /runMyAnalysis.sh
+RUN chmod 755 runMyAnalysis.sh
+
+ENTRYPOINT ["/runMyAnalysis.sh"]
+\end{lstlisting}
+
+The Dockerfile starts with the keyword ''FROM``, 
+stating from which base image this image will be derived.
+Typically these base images provide the operating system and some adaptations to it. 
+In our case it's based on CentOS, 
+specifically extended to provide software typically required for analyses in KM3NeT. 
+''km3net`` denotes the name of the collaboration on Dockerhub\footnote{\url{https://hub.docker.com/u/km3net/}}, 
+''km3base`` is the name of the base image used for analyses in KM3NeT and 
+''20160909`` is the tag identifying which version of the base image is to be used. 
+The common tag ''latest`` is not used intentionally, as this could change the basis of the analysis unnoticed. 
+MAINTAINER is again a keyword, used to identify and contact the author. 
+
+% \subsubsection{Adding own files}
+\label{sec:addingYourCode}
+
+To have the scripts, source code and input files for the analysis available in the Docker image, the keyword ''COPY`` is used.
+The first statement 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+COPY myAnalysis /myAnalysis
+\end{lstlisting}
+copies the local folder myAnalysis, which is located within the toyExample folder. 
+The destination /myAnalysis specifies at what location the folder will be available when the Docker container is run. 
+The same is done for the input files by
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+COPY externalInput /myAnalysis/input 
+\end{lstlisting}
+''RUN`` is a keyword in the Dockerfile that tells Docker to execute this statement once when creating the image. 
+Hence the command 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+RUN make -C /myAnalysis
+\end{lstlisting}
+compiles the source code within the Docker image, producing the binary file. 
+This is analogous to executing ''make`` within the folder toyExample/myAnalysis/, 
+but in contrast to the command executed on the host computer, 
+it uses the software versions provided by the base image 
+(and potential changes made by previous commands). 
+As this is a well defined state that cannot change over time, 
+the same result will be obtained when the command is executed in the future. 
+Analogously the commands
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+COPY runMyAnalysis.sh /runMyAnalysis.sh
+RUN chmod 755 runMyAnalysis.sh
+\end{lstlisting}
+copy the file ''runMyAnalysis.sh`` to the file system within the Docker image and change the access rights for it, 
+just as they would do on a host machine. 
+To automatically run the analysis when the image is executed, the command:
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+ENTRYPOINT ["/runMyAnalysis.sh"]
+\end{lstlisting}
+is used.
+
+\subsubsection{runMyAnalysis.sh}
+\label{sec:runmyanalysis}
+For simplicity and clarity we incorporate the workflow of the analysis into the docker image using a bash script. 
+This is what ''runMyAnalysis.sh`` is for. In this example it reads:
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+#!/bin/bash
+cd /myAnalysis
+
+echo "Executing analysis"
+./bin/myAnalysisBinary
+
+echo "Collecting all results to /myAnalysis/output/"
+mv outputfile.txt /myAnalysis/output/
+chmod -R 777 /myAnalysis/output/
+\end{lstlisting}
+This file enters the path where our software is located in 
+the file system within the Docker image, 
+executes the already compiled software 
+(this happened in the Dockerfile at ''RUN make -C /myAnalysis`` but it can as well be done here) 
+and moves the resulting output to a desired location.
+The change of access rights in the last line is the simplest solution 
+to deal with different users within Docker and on the host system. 
+
+Obviously this is a simple setup, but also a more complex analysis should be able to be executed by shell scripts. 
+
+\subsubsection{Creating the Docker image}
+\label{sec:createImage}
+The information in Sections \ref{sec:dockerfile} and \ref{sec:runmyanalysis} 
+is already sufficient to create a new Docker image. 
+It can be done by executing
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+docker build -t my_analysis:v1 .
+\end{lstlisting}
+in the folder toyExample (or in general the folder where the Dockerfile is located). 
+Please note that the point at the end of the line is part of the command, not this writing. 
+
+Docker will now automatically download all parts of the km3net base image 
+that are not present already and then build the new image. 
+Hence following calls will be faster, as no additional parts have to be downloaded. 
+If everything succeeded, the command ''docker images`` 
+should list at least the base image km3net/km3base 
+with the version tag specified in the Dockerfile and 
+the new image my\_analysis with tag v1. 
+
+A unique version tag is essential, as multiple iterations of an analysis could be produced in the future. 
+To automatically ensure such a tag, the script ''createDocker.sh`` can be used.
+It executes the docker build command and simply adds the date as version tag. 
+
+
+\subsubsection{Running the Docker container}
+\label{sec:runContainer}
+
+After Section \ref{sec:createImage} a Docker image with the example analysis should be available. 
+Actually running the example in a Docker container\footnote{The object running the image 
+(and taking care of various other things in the background) is called a container. 
+One could think of it as being similar to a binary file (image) and the process running it (container).} 
+is done using the command 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+docker run -v `pwd`/output:/myAnalysis/output my_analysis:v1
+\end{lstlisting}
+
+While ''docker run my\_analysis:v1``
+would be enough to run the example, the output is stored in folder 
+''/myAnalysis/output/`` as specified in Section \ref{sec:runmyanalysis}.
+Without any further options this folder lives within the Docker container, but is not accessible from the outside. 
+Therefore the option -v is used to mount a folder from the host system to a folder in the container. 
+With ''-v `pwd`/output:/myAnalysis/output``, all files that are written within the container to /myAnalysis/output, 
+are actually stored to the folder ./output. 
+We write `pwd`/output instead of ./output because the 
+paths may not be relative but have to be absolute when using the option -v. 
+
+When we run the Docker container, we see the output that would be printed when 
+executing the script runMyAnalysis.sh directly, and the output file is found in folder ./output. 
+It should be noted that no changes made to the container by the execution of our analysis 
+are stored to any image. 
+Therefore all desired output has to end up in the designated output folder (or another mounted volume). 
+
+We have now successfully ported our analysis to Docker, ensuring that it can easily be run  
+on a different machine and reliably yields the same results. 
+
+
+
+\subsection{Installing and updating software}
+\label{sec:installSoftware}
+As the base image is derived from CentOS, one could update the contained software using yum. 
+But \textbf{WE WANT TO AVOID CHANGING THE SOFTWARE OF THE BASE IMAGE!}
+
+To achieve reproducibility, one should ideally rely on the exact software installed in the base image and only add your own code. 
+If you require additional or updated third-party software, the best (and for you most convenient) way 
+is to kindly ask the maintainer of the base image for an updated version. 
+This doesn't cause unnecessarily effort, 
+as others will likely require this change at some point in time, too. 
+
+\subsubsection{Installing software yourself}
+Anyway, if you have a reason not to do this (the maintainer might be horribly busy, on vacation for six weeks, ...) 
+you can also install additional third party software yourself, 
+but \textbf{\textit{only}} if the version number of the software is specified. 
+This means for example that you may not use 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+RUN yum -y install boost 
+\end{lstlisting}
+but instead must use 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+RUN yum -y install boost-1.53.0
+\end{lstlisting}
+The flag ''-y`` is required as creating the Docker image isn't an interactive process. 
+Hence the command would fail without it. 
+If you don't know what version numbers are available for a certain software, you can use 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+docker run -it --entrypoint /bin/bash km3net/km3base:20160909
+\end{lstlisting}
+(Replace the tag with your base image) \\
+This opens an interactive shell in a container running the base image. 
+Then type ''yum list boost`` to see the available versions. 
+
+Since even specifying the version of software is not always an option, 
+the next best solution would be to download a fixed state of third-party software 
+and to add it to the image similar to what you would do with your own code, 
+see Section \ref{sec:addingYourCode}. 
+In this case you have to preserve the downloaded fixed state together with the Dockerfile and your own code, 
+as it has just become part of your analysis software. 
+
+
+\subsubsection{Smaller images after installing software}
+If you need to install software yourself, here are a few hints to produce smaller images: \\
+- Install all required software in one command instead of multiple. Hence 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+RUN yum -y install boost-1.53.0 git-1.8.3.1
+\end{lstlisting}
+is to be preferred over
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+RUN yum -y install boost-1.53.0
+RUN yum -y install git-1.8.3.1
+\end{lstlisting}
+The reason for this is that each of these commands creates an individual layer. 
+Since the status of the image is stored for each layer, a single command requires less space than multiple commands. \\
+- It is also a good idea to add ''\&\& yum -y clean all`` at the end of an installation, 
+as unnecessary intermediate and cached files will be removed. 
+The final command should therefore be
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+RUN yum -y install boost-1.53.0 git-1.8.3.1 && yum -y clean all
+\end{lstlisting}
+
+
+\subsection{Dealing with large input files}
+Instead of copying the input files to the image as we did in Section \ref{sec:dockerfile}, 
+we could have also mounted a volume (using -v) as we did for the output files. 
+The advantage of copying the input to the image is that it is stored together with the image, 
+making it trivial to reproduce results in the end. 
+For very large input files this becomes a disadvantage, as these would have to be stored, too. 
+The best possible approach in such a situation would be to try to extract 
+the information relevant for this analysis, e.g. by removing unused raw data from the files. 
+Alternatively, if the data ain't a custom selection 
+but a standard set used by many analyses, one might think about including it into the base image. 
+The last option should be not to include the input into the image at all, but to mount it. 
+Even though the exact definition of ''very large`` (and especially ''too large``) 
+depends on the actual situation and will certainly change over time, 
+as a very coarse guide for orientation, input data of up to 2 GB should just be included in an image. 
+Nevertheless, it is always a good idea to remove unnecessary parts from the input 
+as long as the original data can still be uniquely identified. 
+
+
+\subsection{Removing deprecated containers and images}
+When beginning to experiment with Docker, it is likely that a multitude of containers and images will  
+soon occupy a non-negligible amount of space on the machine. 
+As we won't need our first baby-steps anymore, we can get rid of these images. 
+Since Docker doesn't allow the removal of images that are still used in any container, 
+we first have to get rid of deprecated containers. 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+docker ps -a
+\end{lstlisting}
+shows a list of all containers we have run. 
+The relevant identifier for a container is its ID, e.g. ''d6cc1ff47c72``
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+docker rm d6cc1ff47c72
+\end{lstlisting}
+removes this container. 
+The file ''cleanContainer.sh`` in the main folder removes all found containers. 
+Don't worry, removing containers does not hurt the images. 
+Once all containers referring to an image are removed, the image itself can be removed.
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+docker images
+\end{lstlisting}
+shows the list of stored images. 
+Note that the displayed size of the images also includes base images. 
+Hence your own image is displayed \textit{at least} as big as the base image, 
+but, due to the layered structure of Docker images, in reality only requires approximately the difference of the two numbers. 
+To remove an image one again uses its identifier, e.g. ''49462b1e4dcb``. 
+The command would be 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+docker rmi 49462b1e4dcb
+\end{lstlisting}
+
+\section{Summary}
+
+Using Docker for an analysis is a small one-time effort, 
+but it benefits yourself (easy to fulfill requests), 
+your colleagues (easier to start working on an established project) 
+and the collaboration (reliable reproducibility).
+
+
+
+\end{document}
