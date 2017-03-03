@@ -10,6 +10,6 @@
 documents/*.log
 *.pdf
 km3base/logs/*.log
-# toyExample/output/*
+toyExample/output/*
 */bin/*
 *.o
