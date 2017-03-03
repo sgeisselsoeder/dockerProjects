@@ -179,6 +179,7 @@ is used.
 
 \subsubsection{runMyAnalysis.sh}
 \label{sec:runmyanalysis}
+(TODO: change myAnalysis/output to /output and ./ouput to host/externalOutput, consistent with input)
 For simplicity and clarity we incorporate the workflow of the analysis into the docker image using a bash script. 
 This is what ''runMyAnalysis.sh`` is for. In this example it reads:
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
@@ -370,11 +371,29 @@ The command would be
 docker rmi 49462b1e4dcb
 \end{lstlisting}
 
+\section{Using images}
+
+Once an image has been created and uploaded to the KM3NeT Dockerhub account, executing it becomes simple. 
+For instance to run the official version of the toy example it is sufficient to execute
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+docker run -v `pwd`/output:/myAnalysis/output km3net:my_analysis:20170304
+\end{lstlisting}
+The corresponding image has been created exactly as described in Section \ref{sec:toyexample} 
+and is downloaded like the base image has been in Section \ref{sec:createImage}. 
+
+Once we have a working understanding how that is achieved, 
+it is simple to use it for another analysis. 
+We can execute the multiscale analysis (TODO refs, \url{https://github.com/sgeisselsoeder/multiscale}), simply by the command 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+docker run -v `pwd`/output:/myAnalysis/output km3net:multiscale:20170304
+\end{lstlisting}
+(TODO input)
+
 \section{Summary}
 
-Using Docker for an analysis is a small one-time effort, 
+Using Docker for your analysis is a moderate one-time effort, 
 but it benefits yourself (easy to fulfill requests), 
-your colleagues (easier to start working on an established project) 
+your colleagues (easier to get involved in your project) 
 and the collaboration (reliable reproducibility).
 
 
