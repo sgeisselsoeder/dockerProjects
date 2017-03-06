@@ -22,7 +22,7 @@ fi
 
 echo "Collecting all results to /output/"
 mv ./output/scenarioEvaluation/hammerProjEquatorial.txt /output/
-mv ./output/scenarioEvaluation/*.pdf /output/
+mv ./output/scenarioEvaluation/equatorialFineCoarse.pdf /output/equatorial.pdf
 chmod -R 777 /output/
 
 echo "All done! Thank you for your patience."
