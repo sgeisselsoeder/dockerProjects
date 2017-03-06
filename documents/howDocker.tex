@@ -376,7 +376,7 @@ docker rmi 49462b1e4dcb
 \section{Using images with Dockerhub}
 
 Once an image has been created it can be uploaded to the 
-KM3NeT Dockerhub account\footnote{This has to be done by the current administrator of this account.}. 
+KM3NeT Dockerhub account\footnote{This has to be done by the current administrator of the KM3NeT account.}. 
 Beware however to only include input data that should become public in uploaded images. 
 For not (yet) public data, either mount the input instead of including 
 it to the image (see Section \ref{sec:addingYourCode}) 
@@ -385,7 +385,7 @@ or do not upload the image (yet), but store it on protected storage.
 The benefit is that sharing and executing the analysis becomes trivial. 
 For instance to run the official version of the toy example it is sufficient to execute
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
-docker run -v `pwd`/extOut:/output km3net/my_analysis:20170306
+docker run -v `pwd`/extOutput:/output km3net/my_analysis:20170306
 \end{lstlisting}
 The corresponding image has been created exactly as described in Section \ref{sec:toyexample} 
 and is downloaded like the base image has been in Section \ref{sec:createImage}. 
@@ -395,7 +395,7 @@ it is simple to use the same scheme for another analysis.
 We can execute the multiscale analysis (\cite{geisselsoeder:phd}, \cite{gith:multiscale}), 
 simply by the command 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
-docker run -v `pwd`/extOut:/output km3net/multiscale:20170306
+docker run -v `pwd`/extOutput:/output km3net/multiscale:20170306
 \end{lstlisting}
 
 
