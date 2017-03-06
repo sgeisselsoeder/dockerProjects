@@ -1,12 +1,16 @@
 #!/bin/bash
-cd /myAnalysis
 
+echo "Using inputs from /input"
+ln -s /input /myAnalysis/input
+
+echo "All output will be stored in /output/. Do not forget to run this container with \"-v /path/to/folder/you/want/output:/output/\" if you haven't done so already."
+
+cd /myAnalysis
 echo "Executing analysis"
-echo "All output will be stored in /myAnalysis/output/. Do not forget to run this container with \"-v /path/to/folder/you/want/output:/myAnalysis/output/\" if you haven't done so already."
 ./bin/myAnalysisBinary
 
-echo "Collecting all results to /myAnalysis/output/"
-mv outputfile.txt /myAnalysis/output/
-chmod -R 777 /myAnalysis/output/
+echo "Collecting all results to /output/"
+mv outputfile.txt /output/
+chmod -R 777 /output/
 
 echo "All done!"

@@ -13,10 +13,10 @@ MAINTAINER Stefan Geisselsoeder <stefan.geisselsoeder@fau.de>
 #     yum clean all
 
 COPY myAnalysis /myAnalysis 
-COPY externalInput /myAnalysis/input 
+COPY externalInput /input
+COPY runMyAnalysis.sh /runMyAnalysis.sh
 
 RUN make -C /myAnalysis
-COPY runMyAnalysis.sh /runMyAnalysis.sh
 RUN chmod 755 runMyAnalysis.sh
 
 ENTRYPOINT ["/runMyAnalysis.sh"]

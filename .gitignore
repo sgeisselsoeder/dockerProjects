@@ -6,6 +6,8 @@
 *.toc
 *.snm
 *.sty.backup
+*.bbl
+*.blg
 *nonpublic*
 documents/*.log
 *.pdf

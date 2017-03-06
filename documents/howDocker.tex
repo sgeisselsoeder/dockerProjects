@@ -27,17 +27,12 @@ ECAP, FAU Erlangen-Nürnberg}
 \date{\today}
 \maketitle
 
-\section{Should you use Docker for your analysis?}
+\section{Why should you use Docker for your analysis?}
 
-Yes. 
-
-\section{Why?}
-
-Experience tells us that for most analyses at some point in time there 
-is a demand for changes or additional checks. 
+At some point there is a demand to repeat, change or externally check an analysis. 
 Using Docker will simplify your work in these cases. 
 
-You can be sure that you will be able to repeat the parts 
+You can be sure that you will be able to reproduce the parts 
 of your analysis that are covered by Docker even if the 
 computer/cluster/cloud/whatever you used to obtain your result in the first place 
 has been updated or when the specific machine is not available anymore.
@@ -49,6 +44,7 @@ Another advantage is that it also helps a student or colleague that is to reuse 
 He or she will be able to start where you left of and develop further 
 without first having to worry about the details of how to compile, install or run your work.  
 
+
 \section{Can you use Docker for your analysis?}
 
 For almost all analyses: yes. \\
@@ -58,52 +54,43 @@ Foreseeable complications can be dealt with:
  \item If you use many compute nodes e.g. to prefilter data in a customized way, 
  you can run the evaluation on the prefiltered data with Docker. 
  Alternatively, if the cluster/cloud you use for filtering also supports Docker, 
- you could also use a second Docker image for the filtering process. 
+ you can use a second Docker image for the filtering process. 
  \item If you require dedicated hardware like GPUs, some additional work is required, 
  but the general procedure stays the same. 
- See e.g. \url{https://github.com/NVIDIA/nvidia-docker} for more details on this. 
+ See e.g. \cite{nvidia:docker} for more details on this. 
 \end{itemize}
 
 \section{How can you use Docker?}
 
 We discuss a toy example in C++ on Linux here, 
 but the steps translate to different languages and operating systems. 
-Another example for the already developed multiscale source search 
-analysis\footnote{TODO referenzen, \url{https://github.com/sgeisselsoeder/multiscale}} 
-can be found in the folder where also the toy example is located. 
-This tutorial can be obtained at (TODO url dockerhub/github). 
+This tutorial can be obtained at \url{https://github.com/sgeisselsoeder/dockerProjects}. 
 As a side remark, even though the example in Section \ref{sec:toyexample} 
 may be sufficient to run your own analysis with docker, 
-please have a look at Section \ref{sec:installSoftware} in the end 
-for a few more, also relevant aspects!
+please also have a look at Section \ref{sec:installSoftware}  
+for further relevant aspects.
 
 \subsection{Prerequisites}
 \label{sec:isDockerRunning}
 
 This tutorial assumes that you have your input files and your code available and that you have Docker 
 installed\footnote{Information on how to install Docker can be found e.g. at 
-\url{https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04} 
-or \url{https://docs.docker.com/engine/installation/}.} 
-and working. 
+\cite{digoc:install}
+or \cite{dock:install}
+.} and working. 
 
 You can check if Docker is working correctly by typing ``docker ps'' into your favorite shell. 
 If the output starts similar to ``CONTAINER ID \hspace{0.5cm} IMAGE \hspace{0.5cm} COMMAND``, you are good to go. 
 If it fails, but ''sudo docker ps`` works, your user is not part of the Docker group. 
-You can either prepend sudo to all docker commands or add your user to the Docker group (see install Docker). 
+You can either prepend sudo to all docker commands or add your user to the Docker group (see \cite{digoc:install}). 
 
 \subsection{A toy example}
 \label{sec:toyexample}
 Everything required for our example is located in the folder toyExample. 
 Within toyExample there is a folder named externalInput which contains the prefiltered input files, 
 a folder named myAnalysis which contains the required source code, Makefiles, scripts, etc., 
-a folder output where the output of the analysis will be stored, 
+a folder externalOutput where the output of the analysis will be stored, 
 a script called runMyAnalysis.sh that will execute the analysis and a file called Dockerfile. 
-
-For a really quick example, execute within the folder toyExample:
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
-docker build -t my_analysis:v1 .
-docker run -v `pwd`/output:/myAnalysis/output my_analysis:v1
-\end{lstlisting}
 
 \subsubsection{The Dockerfile}
 \label{sec:dockerfile}
@@ -118,40 +105,44 @@ FROM km3net/km3base:20160909
 MAINTAINER S. Geisselsoeder <stefan.geisselsoeder@fau.de>
 
 COPY myAnalysis /myAnalysis
-COPY externalinput /myAnalysis/input 
+COPY externalInput /input
+COPY runMyAnalysis.sh /runMyAnalysis.sh
 
 RUN make -C /myAnalysis
-COPY runMyAnalysis.sh /runMyAnalysis.sh
 RUN chmod 755 runMyAnalysis.sh
 
 ENTRYPOINT ["/runMyAnalysis.sh"]
 \end{lstlisting}
-
 The Dockerfile starts with the keyword ''FROM``, 
 stating from which base image this image will be derived.
 Typically these base images provide the operating system and some adaptations to it. 
 In our case it's based on CentOS, 
 specifically extended to provide software typically required for analyses in KM3NeT. 
-''km3net`` denotes the name of the collaboration on Dockerhub\footnote{\url{https://hub.docker.com/u/km3net/}}, 
+''km3net`` denotes the name of the collaboration on Dockerhub\cite{dockerhub:km3net}
 ''km3base`` is the name of the base image used for analyses in KM3NeT and 
 ''20160909`` is the tag identifying which version of the base image is to be used. 
 The common tag ''latest`` is not used intentionally, as this could change the basis of the analysis unnoticed. 
 MAINTAINER is again a keyword, used to identify and contact the author. 
 
-% \subsubsection{Adding own files}
 \label{sec:addingYourCode}
-
 To have the scripts, source code and input files for the analysis available in the Docker image, the keyword ''COPY`` is used.
 The first statement 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
 COPY myAnalysis /myAnalysis
 \end{lstlisting}
 copies the local folder myAnalysis, which is located within the toyExample folder. 
-The destination /myAnalysis specifies at what location the folder will be available when the Docker container is run. 
+It contains the source code of the toy example.
+The destination /myAnalysis specifies where the folder will be available when the Docker container is run. 
 The same is done for the input files by
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
-COPY externalInput /myAnalysis/input 
+COPY externalInput /input 
 \end{lstlisting}
+and for the script ''runMyAnalysis.sh`` that will be used to execute the example. 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+COPY runMyAnalysis.sh /runMyAnalysis.sh
+\end{lstlisting}
+This script is explained in Section \ref{sec:runmyanalysis}.
+
 ''RUN`` is a keyword in the Dockerfile that tells Docker to execute this statement once when creating the image. 
 Hence the command 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
@@ -164,14 +155,12 @@ it uses the software versions provided by the base image
 (and potential changes made by previous commands). 
 As this is a well defined state that cannot change over time, 
 the same result will be obtained when the command is executed in the future. 
-Analogously the commands
+The command
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
-COPY runMyAnalysis.sh /runMyAnalysis.sh
 RUN chmod 755 runMyAnalysis.sh
 \end{lstlisting}
-copy the file ''runMyAnalysis.sh`` to the file system within the Docker image and change the access rights for it, 
-just as they would do on a host machine. 
-To automatically run the analysis when the image is executed, the command:
+changes the access rights for the file, just as it would do on a host machine. 
+To automatically run the analysis by default when the image is executed, the command
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
 ENTRYPOINT ["/runMyAnalysis.sh"]
 \end{lstlisting}
@@ -179,29 +168,38 @@ is used.
 
 \subsubsection{runMyAnalysis.sh}
 \label{sec:runmyanalysis}
-(TODO: change myAnalysis/output to /output and ./ouput to host/externalOutput, consistent with input)
-For simplicity and clarity we incorporate the workflow of the analysis into the docker image using a bash script. 
+For simplicity and clarity we incorporate the workflow of the analysis 
+into the docker image using a bash script. 
 This is what ''runMyAnalysis.sh`` is for. In this example it reads:
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
 #!/bin/bash
-cd /myAnalysis
+echo "Using inputs from /input"
+ln -s /input /myAnalysis/input
 
 echo "Executing analysis"
+cd /myAnalysis
 ./bin/myAnalysisBinary
 
-echo "Collecting all results to /myAnalysis/output/"
-mv outputfile.txt /myAnalysis/output/
-chmod -R 777 /myAnalysis/output/
+echo "Collecting all results to /output/"
+mv outputfile.txt /output/
+chmod -R 777 /output/
 \end{lstlisting}
-This file enters the path where our software is located in 
+This file links the input to the path where the binary expects it to be 
+(we could also copy it), 
+enters the path where our software is located in 
 the file system within the Docker image, 
 executes the already compiled software 
-(this happened in the Dockerfile at ''RUN make -C /myAnalysis`` but it can as well be done here) 
 and moves the resulting output to a desired location.
-The change of access rights in the last line is the simplest solution 
+The compilation happened in the Dockerfile at ''RUN make -C /myAnalysis``, 
+but it could as well be done here.
+The difference is that the statement in the Dockerfile 
+is executed once when creating the image, while a ''make`` in this script will be executed 
+every time the image is started. 
+Hence we prefer to have it in the Dockerfile. 
+The change of access rights in the last line is one of the simplest solutions 
 to deal with different users within Docker and on the host system. 
 
-Obviously this is a simple setup, but also a more complex analysis should be able to be executed by shell scripts. 
+Obviously this is a simple setup, but every analysis should be able to be executed by some sort of scripts. 
 
 \subsubsection{Creating the Docker image}
 \label{sec:createImage}
@@ -211,20 +209,22 @@ It can be done by executing
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
 docker build -t my_analysis:v1 .
 \end{lstlisting}
-in the folder toyExample (or in general the folder where the Dockerfile is located). 
-Please note that the point at the end of the line is part of the command, not this writing. 
+in the folder toyExample. 
+''my\_analysis`` is the name we want the Docker image to have, 
+''.`` is the relative path to the Dockerfile.
 
 Docker will now automatically download all parts of the km3net base image 
-that are not present already and then build the new image. 
-Hence following calls will be faster, as no additional parts have to be downloaded. 
+(we specified that in the Dockerfile)
+which are not present already and then build the new image. 
+Subsequent calls of this command will be faster, as no additional parts have to be downloaded. 
+
 If everything succeeded, the command ''docker images`` 
-should list at least the base image km3net/km3base 
+should now list at least the base image km3net/km3base 
 with the version tag specified in the Dockerfile and 
 the new image my\_analysis with tag v1. 
-
 A unique version tag is essential, as multiple iterations of an analysis could be produced in the future. 
 To automatically ensure such a tag, the script ''createDocker.sh`` can be used.
-It executes the docker build command and simply adds the date as version tag. 
+It executes the docker build command and adds the date as version tag. 
 
 
 \subsubsection{Running the Docker container}
@@ -233,30 +233,32 @@ It executes the docker build command and simply adds the date as version tag.
 After Section \ref{sec:createImage} a Docker image with the example analysis should be available. 
 Actually running the example in a Docker container\footnote{The object running the image 
 (and taking care of various other things in the background) is called a container. 
-One could think of it as being similar to a binary file (image) and the process running it (container).} 
+One could think of it as being slightly similar to a binary file (image) and the process running it (container).} 
 is done using the command 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
-docker run -v `pwd`/output:/myAnalysis/output my_analysis:v1
+docker run -v `pwd`/externalOutput:/output my_analysis:v1
 \end{lstlisting}
-
 While ''docker run my\_analysis:v1``
 would be enough to run the example, the output is stored in folder 
-''/myAnalysis/output/`` as specified in Section \ref{sec:runmyanalysis}.
+''/output/`` as specified in Section \ref{sec:runmyanalysis}.
 Without any further options this folder lives within the Docker container, but is not accessible from the outside. 
-Therefore the option -v is used to mount a folder from the host system to a folder in the container. 
-With ''-v `pwd`/output:/myAnalysis/output``, all files that are written within the container to /myAnalysis/output, 
-are actually stored to the folder ./output. 
-We write `pwd`/output instead of ./output because the 
+Therefore the option -v can be used to mount a folder from the host system to a folder in the container. 
+With ''-v `pwd`/externalOutput:/output``, all files that are written within the container to /output 
+are actually stored to the folder ./externalOutput on the host system. 
+We write `pwd`/externalOutput instead of ./externalOutput because the 
 paths may not be relative but have to be absolute when using the option -v. 
 
 When we run the Docker container, we see the output that would be printed when 
-executing the script runMyAnalysis.sh directly, and the output file is found in folder ./output. 
+executing the script runMyAnalysis.sh directly, and afterwards the output is found in folder ./externalOutput. 
 It should be noted that no changes made to the container by the execution of our analysis 
 are stored to any image. 
 Therefore all desired output has to end up in the designated output folder (or another mounted volume). 
+Even though it is not mandatory for Docker, 
+we propose to use the convention of /input and /output folders for Docker images. 
+This convention simplifies their usage significantly. 
 
 We have now successfully ported our analysis to Docker, ensuring that it can easily be run  
-on a different machine and reliably yields the same results. 
+on a different machine and will reliably yield the same results. 
 
 
 
@@ -335,9 +337,9 @@ but a standard set used by many analyses, one might think about including it int
 The last option should be not to include the input into the image at all, but to mount it. 
 Even though the exact definition of ''very large`` (and especially ''too large``) 
 depends on the actual situation and will certainly change over time, 
-as a very coarse guide for orientation, input data of up to 2 GB should just be included in an image. 
+as a very coarse guide for orientation, input of up to 2 GB should be included in an image. 
 Nevertheless, it is always a good idea to remove unnecessary parts from the input 
-as long as the original data can still be uniquely identified. 
+as long as the original data can be uniquely identified. 
 
 
 \subsection{Removing deprecated containers and images}
@@ -371,23 +373,31 @@ The command would be
 docker rmi 49462b1e4dcb
 \end{lstlisting}
 
-\section{Using images}
+\section{Using images with Dockerhub}
 
-Once an image has been created and uploaded to the KM3NeT Dockerhub account, executing it becomes simple. 
+Once an image has been created it can be uploaded to the 
+KM3NeT Dockerhub account\footnote{This has to be done by the current administrator of this account.}. 
+Beware however to only include input data that should become public in uploaded images. 
+For not (yet) public data, either mount the input instead of including 
+it to the image (see Section \ref{sec:addingYourCode}) 
+or do not upload the image (yet), but store it on protected storage. 
+
+The benefit is that sharing and executing the analysis becomes trivial. 
 For instance to run the official version of the toy example it is sufficient to execute
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
-docker run -v `pwd`/output:/myAnalysis/output km3net:my_analysis:20170304
+docker run -v `pwd`/extOut:/output km3net:my_analysis:20170306
 \end{lstlisting}
 The corresponding image has been created exactly as described in Section \ref{sec:toyexample} 
 and is downloaded like the base image has been in Section \ref{sec:createImage}. 
 
-Once we have a working understanding how that is achieved, 
-it is simple to use it for another analysis. 
-We can execute the multiscale analysis (TODO refs, \url{https://github.com/sgeisselsoeder/multiscale}), simply by the command 
+As we now understand how that is achieved, 
+it is simple to use the same scheme for another analysis. 
+We can execute the multiscale analysis (\cite{geisselsoeder:phd}, \cite{gith:multiscale}), 
+simply by the command 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
-docker run -v `pwd`/output:/myAnalysis/output km3net:multiscale:20170304
+docker run -v `pwd`/extOut:/output km3net:multiscale:20170306
 \end{lstlisting}
-(TODO input)
+
 
 \section{Summary}
 
@@ -396,6 +406,16 @@ but it benefits yourself (easy to fulfill requests),
 your colleagues (easier to get involved in your project) 
 and the collaboration (reliable reproducibility).
 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
+git clone https://github.com/sgeisselsoeder/dockerProjects.git temp
+cd temp/toyExample
+docker build -t my_analysis:v1 .
+docker run -v `pwd`/externalOutput:/output my_analysis:v1
+\end{lstlisting}
 
+
+\bibliography{dockerRefs}
+\bibliographystyle{alpha}
 
 \end{document}
+

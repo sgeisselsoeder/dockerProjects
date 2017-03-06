@@ -37,7 +37,7 @@ are non-trivial to be reproduced exactly and sometimes not all dependencies are 
 
 Techniques like Docker can help not only to achieve this reproducibility, 
 but also in situations where checks or changes are desired after the know-how is not fully available anymore, 
-e.g. when the original creator has left a collaboration and a new person is to take over this work. 
+e.g. when the original creator has left a collaboration, or when a new person is to become involved in a workflow. 
 
 \section{Considerations that led to Docker}
 
@@ -48,6 +48,7 @@ Here are a few considerations of alternatives.
 
 Just plainly executing custom scripts on a machine in its currently available state 
 risks not to be able to reproduce the computation and results with updated hard/software. 
+
 
 \subsection{Virtual machines}
 
@@ -91,6 +92,7 @@ While it offers an elegant way to deal with these dependencies, it does not (and
 Furthermore it doesn't support Microsoft Windows and, 
 judging from the current size of the Nix community, is also less widespread than Docker. 
 
+
 \subsection{Others}
 
 There are many other similar approaches 
@@ -101,6 +103,7 @@ On the other hand, to achieve a long-term reproducibility, which is key to us,
 a solution should be supported by a large community and as many other cooperations or companies as possible. 
 The current status is that this is fulfilled best by Docker. 
 Furthermore, many alternatives also support Docker images or Dockerfiles, while their extensions usually are incompatible to others. 
+
 
 \subsection{Summary}
 
