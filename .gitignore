@@ -15,3 +15,5 @@ km3base/logs/*.log
 toyExample/output/*
 */bin/*
 *.o
+*/externalOutput/*.txt
+*/externalOutput/*.pdf
