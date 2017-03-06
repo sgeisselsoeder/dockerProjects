@@ -385,7 +385,7 @@ or do not upload the image (yet), but store it on protected storage.
 The benefit is that sharing and executing the analysis becomes trivial. 
 For instance to run the official version of the toy example it is sufficient to execute
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
-docker run -v `pwd`/extOut:/output km3net:my_analysis:20170306
+docker run -v `pwd`/extOut:/output km3net/my_analysis:20170306
 \end{lstlisting}
 The corresponding image has been created exactly as described in Section \ref{sec:toyexample} 
 and is downloaded like the base image has been in Section \ref{sec:createImage}. 
@@ -395,7 +395,7 @@ it is simple to use the same scheme for another analysis.
 We can execute the multiscale analysis (\cite{geisselsoeder:phd}, \cite{gith:multiscale}), 
 simply by the command 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
-docker run -v `pwd`/extOut:/output km3net:multiscale:20170306
+docker run -v `pwd`/extOut:/output km3net/multiscale:20170306
 \end{lstlisting}
 
 
