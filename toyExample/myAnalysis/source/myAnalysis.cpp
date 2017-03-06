@@ -5,7 +5,7 @@
 
 int main()
 {
-	std::ifstream inHere("./input/dummyfile.txt");
+	std::ifstream inHere("./input/dummyInput.txt");
 	assert(inHere.is_open() && inHere.good());
 	std::ofstream outOfHere("outputfile.txt");
 	assert(outOfHere.is_open() && outOfHere.good());
