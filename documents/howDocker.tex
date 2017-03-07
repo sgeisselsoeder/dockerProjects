@@ -91,11 +91,12 @@ You can check if Docker is working correctly by typing ``docker ps'' into your f
 If the output starts similar to ``CONTAINER ID \hspace{0.5cm} IMAGE \hspace{0.5cm} COMMAND``, you are good to go. 
 If it fails, but ''sudo docker ps`` works, your user is not part of the Docker group. 
 You can either prepend sudo to all docker commands or add your user to the Docker group (see \cite{digoc:install}). 
-The command for that would be 
+The commands to do that would be 
 \begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 sudo groupadd docker
 sudo gpasswd -a ${USER} docker
 sudo service docker restart
+newgrp docker  # or log out
 \end{lstlisting}
 
 \subsection{A toy example}
