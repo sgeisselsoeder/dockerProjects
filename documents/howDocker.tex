@@ -383,23 +383,22 @@ it to the image (see Section \ref{sec:addingYourCode})
 or do not upload the image (yet), but store it on protected storage. 
 
 The benefit is that sharing and executing the analysis becomes trivial. 
-For instance to run the official version of the toy example it is sufficient to execute
+For instance to run the toy example it is sufficient to execute 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
 docker run -v `pwd`/extOutput:/output km3net/my_analysis:20170306
 \end{lstlisting}
+This does not require you to build the image on your machine. 
 The corresponding image has been created exactly as described in Section \ref{sec:toyexample} 
 and is downloaded like the base image has been in Section \ref{sec:createImage}. 
 
-As we now understand how that is achieved, 
+As we understand now how that is achieved, 
 it is simple to use the same scheme for another analysis. 
-We can execute the multiscale analysis (\cite{geisselsoeder:phd}, \cite{gith:multiscale}), 
-simply by the command 
+We can execute the multiscale analysis 
+\cite{geisselsoeder:phd, gith:multiscale} with the command 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
 docker run -v `pwd`/extOutput:/output km3net/multiscale:20170307
 \end{lstlisting}
-The project creating this image can also be found at \cite{gith:tutorial}, 
-giving an example e.g. how to optionally mount inputs instead of copying them. 
-
+The project creating this image can also be found at \cite{gith:tutorial}.
 
 \section{Summary}
 
