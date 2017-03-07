@@ -64,7 +64,7 @@ Foreseeable complications can be dealt with:
 
 We discuss a toy example in C++ on Linux here, 
 but the steps translate to different languages and operating systems. 
-This tutorial can be obtained at \url{https://github.com/sgeisselsoeder/dockerProjects}. 
+This tutorial can be obtained at \cite{gith:tutorial}. 
 As a side remark, even though the example in Section \ref{sec:toyexample} 
 may be sufficient to run your own analysis with docker, 
 please also have a look at Section \ref{sec:installSoftware}  
@@ -395,8 +395,10 @@ it is simple to use the same scheme for another analysis.
 We can execute the multiscale analysis (\cite{geisselsoeder:phd}, \cite{gith:multiscale}), 
 simply by the command 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,frame=single]
-docker run -v `pwd`/extOutput:/output km3net/multiscale:20170306
+docker run -v `pwd`/extOutput:/output km3net/multiscale:20170307
 \end{lstlisting}
+The project creating this image can also be found at \cite{gith:tutorial}, 
+giving an example e.g. how to optionally mount inputs instead of copying them. 
 
 
 \section{Summary}
