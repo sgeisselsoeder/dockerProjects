@@ -10,7 +10,7 @@
 *.blg
 *nonpublic*
 documents/*.log
-# *.pdf
+documents/*.pdf
 km3base/logs/*.log
 toyExample/output/*
 */bin/*
