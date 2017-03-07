@@ -81,11 +81,11 @@ installed\footnote{Information on how to install Docker can be found e.g. at
 \cite{digoc:install}
 or \cite{dock:install}
 .} and working. 
-
-On recent Ubuntu versions, you can type 
+On Ubuntu 16.04 you can type 
 \begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 sudo apt-get install docker.io
 \end{lstlisting}
+\bigskip
 
 You can check if Docker is working correctly by typing ``docker ps'' into your favorite shell. 
 If the output starts similar to ``CONTAINER ID \hspace{0.5cm} IMAGE \hspace{0.5cm} COMMAND``, you are good to go. 
@@ -95,7 +95,7 @@ The command for that would be
 \begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 sudo groupadd docker
 sudo gpasswd -a ${USER} docker
-sudo service docker.io restart # or # sudo service docker restart
+sudo service docker restart
 \end{lstlisting}
 
 \subsection{A toy example}
