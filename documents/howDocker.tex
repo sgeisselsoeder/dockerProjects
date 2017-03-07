@@ -19,6 +19,9 @@
 % for floatbarriers
 \usepackage{placeins}
 
+% for correct (copy-able to bash) ` in listings
+\usepackage{textcomp}
+
 \begin{document}
 
 \title{Using Docker for your analysis in KM3NeT}
@@ -100,7 +103,7 @@ with all software dependencies, aware or not,
 including even the basic operating system.
 It is used to create the new Docker image, that executes the analysis. 
 In the example the Dockerfile reads: 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 FROM km3net/km3base:20160909
 MAINTAINER S. Geisselsoeder <stefan.geisselsoeder@fau.de>
 
@@ -127,25 +130,25 @@ MAINTAINER is again a keyword, used to identify and contact the author.
 \label{sec:addingYourCode}
 To have the scripts, source code and input files for the analysis available in the Docker image, the keyword ''COPY`` is used.
 The first statement 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 COPY myAnalysis /myAnalysis
 \end{lstlisting}
 copies the local folder myAnalysis, which is located within the toyExample folder. 
 It contains the source code of the toy example.
 The destination /myAnalysis specifies where the folder will be available when the Docker container is run. 
 The same is done for the input files by
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 COPY externalInput /input 
 \end{lstlisting}
 and for the script ''runMyAnalysis.sh`` that will be used to execute the example. 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 COPY runMyAnalysis.sh /runMyAnalysis.sh
 \end{lstlisting}
 This script is explained in Section \ref{sec:runmyanalysis}.
 
 ''RUN`` is a keyword in the Dockerfile that tells Docker to execute this statement once when creating the image. 
 Hence the command 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 RUN make -C /myAnalysis
 \end{lstlisting}
 compiles the source code within the Docker image, producing the binary file. 
@@ -156,12 +159,12 @@ it uses the software versions provided by the base image
 As this is a well defined state that cannot change over time, 
 the same result will be obtained when the command is executed in the future. 
 The command
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 RUN chmod 755 runMyAnalysis.sh
 \end{lstlisting}
 changes the access rights for the file, just as it would do on a host machine. 
 To automatically run the analysis by default when the image is executed, the command
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 ENTRYPOINT ["/runMyAnalysis.sh"]
 \end{lstlisting}
 is used.
@@ -171,7 +174,7 @@ is used.
 For simplicity and clarity we incorporate the workflow of the analysis 
 into the docker image using a bash script. 
 This is what ''runMyAnalysis.sh`` is for. In this example it reads:
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 #!/bin/bash
 echo "Using inputs from /input"
 ln -s /input /myAnalysis/input
@@ -206,7 +209,7 @@ Obviously this is a simple setup, but every analysis should be able to be execut
 The information in Sections \ref{sec:dockerfile} and \ref{sec:runmyanalysis} 
 is already sufficient to create a new Docker image. 
 It can be done by executing
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 docker build -t my_analysis:v1 .
 \end{lstlisting}
 in the folder toyExample. 
@@ -235,7 +238,7 @@ Actually running the example in a Docker container\footnote{The object running t
 (and taking care of various other things in the background) is called a container. 
 One could think of it as being slightly similar to a binary file (image) and the process running it (container).} 
 is done using the command 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 docker run -v `pwd`/externalOutput:/output my_analysis:v1
 \end{lstlisting}
 While ''docker run my\_analysis:v1``
@@ -278,20 +281,20 @@ Anyway, if you have a reason not to do this (the maintainer might be horribly bu
 you can also install additional third party software yourself, 
 but \textbf{\textit{only}} if the version number of the software is specified. 
 This means for example that you may not use 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 RUN yum -y install boost 
 \end{lstlisting}
 but instead must use 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 RUN yum -y install boost-1.53.0
 \end{lstlisting}
 The flag ''-y`` is required as creating the Docker image isn't an interactive process. 
 Hence the command would fail without it. 
 If you don't know what version numbers are available for a certain software, you can use 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 docker run -it --entrypoint /bin/bash km3net/km3base:20160909
 \end{lstlisting}
-(Replace the tag with your base image) \\
+(Replace the tag with your base images) \\
 This opens an interactive shell in a container running the base image. 
 Then type ''yum list boost`` to see the available versions. 
 
@@ -306,11 +309,11 @@ as it has just become part of your analysis software.
 \subsubsection{Smaller images after installing software}
 If you need to install software yourself, here are a few hints to produce smaller images: \\
 - Install all required software in one command instead of multiple. Hence 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 RUN yum -y install boost-1.53.0 git-1.8.3.1
 \end{lstlisting}
 is to be preferred over
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 RUN yum -y install boost-1.53.0
 RUN yum -y install git-1.8.3.1
 \end{lstlisting}
@@ -319,7 +322,7 @@ Since the status of the image is stored for each layer, a single command require
 - It is also a good idea to add ''\&\& yum -y clean all`` at the end of an installation, 
 as unnecessary intermediate and cached files will be removed. 
 The final command should therefore be
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 RUN yum -y install boost-1.53.0 git-1.8.3.1 && yum -y clean all
 \end{lstlisting}
 
@@ -348,19 +351,19 @@ soon occupy a non-negligible amount of space on the machine.
 As we won't need our first baby-steps anymore, we can get rid of these images. 
 Since Docker doesn't allow the removal of images that are still used in any container, 
 we first have to get rid of deprecated containers. 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 docker ps -a
 \end{lstlisting}
 shows a list of all containers we have run. 
 The relevant identifier for a container is its ID, e.g. ''d6cc1ff47c72``
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 docker rm d6cc1ff47c72
 \end{lstlisting}
 removes this container. 
 The file ''cleanContainer.sh`` in the main folder removes all found containers. 
 Don't worry, removing containers does not hurt the images. 
 Once all containers referring to an image are removed, the image itself can be removed.
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 docker images
 \end{lstlisting}
 shows the list of stored images. 
@@ -369,7 +372,7 @@ Hence your own image is displayed \textit{at least} as big as the base image,
 but, due to the layered structure of Docker images, in reality only requires approximately the difference of the two numbers. 
 To remove an image one again uses its identifier, e.g. ''49462b1e4dcb``. 
 The command would be 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 docker rmi 49462b1e4dcb
 \end{lstlisting}
 
@@ -382,9 +385,11 @@ For not (yet) public data, either mount the input instead of including
 it to the image (see Section \ref{sec:addingYourCode}) 
 or do not upload the image (yet), but store it on protected storage. 
 
+
+
 The benefit is that sharing and executing the analysis becomes trivial. 
 For instance to run the toy example it is sufficient to execute 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 docker run -v `pwd`/extOutput:/output km3net/my_analysis:20170306
 \end{lstlisting}
 This does not require you to build the image on your machine. 
@@ -395,7 +400,7 @@ As we understand now how that is achieved,
 it is simple to use the same scheme for another analysis. 
 We can execute the multiscale analysis 
 \cite{geisselsoeder:phd, gith:multiscale} with the command 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 docker run -v `pwd`/extOutput:/output km3net/multiscale:20170307
 \end{lstlisting}
 The project creating this image can also be found at \cite{gith:tutorial}.
@@ -408,7 +413,7 @@ your colleagues (easier to get involved in your project)
 and the collaboration (reliable reproducibility).
 \bigskip
 
-\begin{lstlisting}[basicstyle=\ttfamily\small,columns=flexible,keepspaces=true,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 git clone https://github.com/sgeisselsoeder/dockerProjects.git temp
 cd temp/toyExample
 docker build -t my_analysis:v1 .
