@@ -61,7 +61,7 @@ since a whole virtual machine has to be stored for each analysis.
 
 
 \subsection{Docker}
-
+% 31219 commit 1627 contrib % on 20170307
 Docker\footnote{\url{https://www.docker.com/}} is based on layered containerization. It allows direct access 
 to the underlying kernel while abstracting the software dependencies. 
 Since only the changes to a common base system required by an analysis have to be stored, 
@@ -73,7 +73,7 @@ This prevents many clusters from supporting Docker directly, but it is no major 
 
 
 \subsection{Singularity}
-
+% 2048 commit 34 contrib
 Singularity\footnote{\url{http://singularity.lbl.gov/about}} is another recent
 option that could help with reproducibility similar to Docker. 
 While it even deals with privilege escalations, 
@@ -85,7 +85,7 @@ correlated with a longer support and compatibility of following technologies.}.
 
 
 \subsection{Nix}
-
+% 5075 commit 110 contrib
 Nix\footnote{\url{https://nixos.org/nix}} constitutes a recent development that could be suited to help keeping analyses reproducible. 
 However it focuses on an application and its dependencies. 
 While it offers an elegant way to deal with these dependencies, it does not (and is not intended to) deal with e.g. input files. 
@@ -94,9 +94,10 @@ judging from the current size of the Nix community, is also less widespread than
 
 
 \subsection{Others}
-
+% rkt % 5167 commit 177 contrib
+% flock none
 There are many other similar approaches 
-(e.g. Rocket\footnote{\url{https://coreos.com/rkt}}, Flockport\footnote{\url{https://www.flockport.com}}, etc.), 
+(e.g. rkt\footnote{\url{https://coreos.com/rkt}}, Flockport\footnote{\url{https://www.flockport.com}}, etc.), 
 but on the one hand, there is no essential feature lacking in Docker that would be required 
 for our use-case. 
 On the other hand, to achieve a long-term reproducibility, which is key to us, 
@@ -123,17 +124,12 @@ and doesn't have major drawbacks as far as the investigated use-case, the reprod
   Reproducible & \textcolor{red}{Maybe not} 	& Yes 	& Yes		& Yes	& Yes \\
   \hline
   All OS & Yes 	& Yes 	& Yes		& \textcolor{red}{No}	& \textcolor{red}{No} \\
-%   \hline
-%   Scope & Application & System & System & Application & System TODO check! \\
   \hline
   Widespread & Yes & Yes & Yes & No & No \\
-%   Widespread & Yes & Yes & Yes & \textcolor{red}{No} & \textcolor{red}{No} \\
   \hline
   Efficient & Yes & Possible & Yes & Yes & Yes \\
   \hline
   Storage required & Low & \textcolor{red}{High} & Moderate & Low & Moderate \\
-%   \hline
-%   Security & - & Enhanced & Decreased & - & - \\
 \end{tabular}
 \end{center}
 
