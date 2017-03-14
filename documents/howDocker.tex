@@ -253,6 +253,10 @@ is done using the command
 \begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 docker run -v `pwd`/externalOutput:/output my_analysis:v1
 \end{lstlisting}
+For testing or debugging purposes it is also possible to run interactively:
+\begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
+docker run -it --entrypoint /bin/bash my_analysis:v1
+\end{lstlisting}
 While ''docker run my\_analysis:v1``
 would be enough to run the example, the output is stored in folder 
 ''/output/`` as specified in Section \ref{sec:runmyanalysis}.

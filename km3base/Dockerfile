@@ -66,6 +66,7 @@ RUN mkdir /tmp/root -p && cd /tmp/root/ && \
     make install && \
     rm -rf /tmp/root
 
+#TODO ENV root pfade setzen
 
 RUN yum install -y make gcc gcc-c++ gcc-gfortran \
     cmake zlib-devel\
