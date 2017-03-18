@@ -13,7 +13,6 @@ RUN mkdir -p /input && mkdir -p /output && \
     bash \
     cvs \
     gcc \
-    gcc \
     gcc-c++ \
     git \
     make \
@@ -53,6 +52,7 @@ RUN mkdir -p /input && mkdir -p /output && \
     yum -y clean all 
 #    devtoolset-4-gcc* \
 
+# let's go for ROOT
 RUN mkdir /tmp/root -p && cd /tmp/root/ && \
     wget https://root.cern.ch/download/root_v5.34.36.source.tar.gz && \
     tar xf root_v5.34.36.source.tar.gz && \ 
@@ -61,8 +61,7 @@ RUN mkdir /tmp/root -p && cd /tmp/root/ && \
     make -j 2 ; make -j 2 ; make -j 2 ; make -j 2 && \
     make install && \
     cd / && \
-    rm -rf /tmp/root \
-    && source /usr/local/bin/thisroot.sh && env
+    rm -rf /tmp/root 
 ENV ROOTSYS /usr/local
 ENV LD_LIBRARY_PATH /usr/local/lib/root
 ENV LIBPATH /usr/local/lib/root
@@ -70,29 +69,38 @@ ENV DYLD_LIBRARY_PATH /usr/local/lib/root
 ENV PYTHONPATH /usr/local/lib/root
 ENV SHLIB_PATH /usr/local/lib/root
 
-#RUN wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-8.noarch.rpm && rpm -ivh epel-release-7-8.noarch.rpm
+# Install jpp
+COPY externalResources/JDAQUTCExtended.hh /
+RUN yum -y install --setopt=tsflags=nodocs csh openjdk-8-jdk ghostscript ant bison bzip2-devel CLBSwissKnife cmake28 compat-gcc-34-g77 fftw-devel flex flex-devel gcc gcc-c++ gcc-gfortran gdb git glibc-static gtk2-devel gzip libgpg-error libproxy libX11 libX11-common libX11-devel libXext libXext-devel libXft libXft-devel libXpm libXpm-devel make openssh-server pakchois python-devel subversion tar vim wget zsh && yum -y clean all
+# km3boost km3mono
 
-#RUN yum -y install --setopt=tsflags=nodocs bison bison-devel ant flex flex-devel ghostscript compat-gcc-34-g77 \
-#    && yum -y clean all 
-#RUN yum -y install --setopt=tsflags=nodocs \
-#    libX11 libX11-devel libXpm libXpm-devel libXft libXft-devel libX11-common libXext libXext-devel \
-#    && yum -y clean all 
-#RUN yum -y install --setopt=tsflags=nodocs \
-#    openjdk-7-jdk \
-#    zsh \
-#    fftw-devel \
-#    && yum -y clean all 
+# RUN svn checkout --non-interactive --no-auth-cache --username km3net --password default-km3net-pw http://svn.km3net.de/Jpp/trunk /jpp && \
+RUN svn checkout --non-interactive --no-auth-cache --username km3net --password pyrosoma http://svn.km3net.de/Jpp/tag/v7.1.6632/ /jpp && \
+    mv /JDAQUTCExtended.hh /jpp/software/JDAQ/JDAQUTCExtended.hh && \
+    cd /jpp && source ./setenv.sh && make -j 2 ; make -j 2 ; make -j 2 ; make Antares ; make KM3NeT ; make libs
+# make DAQ not working, not sure if needed
 
-
-# jpp stuff
-# RUN svn checkout --non-interactive --no-auth-cache --username km3net --password the-default-km3net-pw http://svn.km3net.de/Jpp/trunk /Jpp && \
-#    cd /Jpp && \
-#    ls && \
-#    cat Makefile 
-# RUN SHELL="/bin/bash" && \
-#    cd /Jpp && \
-#    source /usr/local/bin/thisroot.sh && \ 
-#    source setenv.sh && \
-#    make
+# (sic!)
+ENV AANET_DIR /jpp/externals/aanet/
+ENV JPP_DATA /jpp/data/
+ENV JDB_DIR /jpp/externals/dbclient/
+ENV LD_LIBRARY_PATH /jpp/externals/aanet/:/jpp/out//Linux/lib/:/jpp/externals/dbclient//lib/:/usr/local/lib/root
+ENV AA_CONVERT_G3 1
+ENV PATH /jpp/externals/aanet/:/jpp/out//Linux/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV AADIR /jpp/externals/aanet/
+ENV JPP_BIN /jpp/out//Linux/bin/
+ENV CHSM_DIR /jpp/externals/chsm/
+ENV AANET_LIB /jpp/externals/aanet/
+ENV TIMER 0
+ENV PYTHONPATH /jpp/externals/aanet/:/usr/local/lib/root
+ENV SYSTEM Linux
+ENV PROCESSOR x86_64
+ENV MACHINE x86_64
+ENV JPP_DIR /jpp
+ENV JPP_OUT /jpp/out/
+ENV JDB_LIB /jpp/externals/dbclient//lib/
+ENV JPP_DOC /jpp/doc/
+ENV DEBUG 0
+ENV JPP_LIB /jpp/out//Linux/lib/
 
 ENTRYPOINT ["/bin/bash"]
