@@ -58,7 +58,7 @@ RUN mkdir /tmp/root -p && cd /tmp/root/ && \
     tar xf root_v5.34.36.source.tar.gz && \ 
     cd root && \
     ./configure linuxx8664gcc --enable-python --prefix=/usr/local && \
-    make -j 4 ; make -j 2 ; make -j 2 && \
+    make -j 2 ; make -j 2 ; make -j 2 ; make -j 2 && \
     make install && \
     cd / && \
     rm -rf /tmp/root \
