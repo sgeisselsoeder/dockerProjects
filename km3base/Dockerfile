@@ -4,7 +4,8 @@ MAINTAINER Stefan Geißelsöder <stefan.geisselsoeder@fau.de>
 
 # everything is in one command to avoid itnermediate layers (saves space)
 #RUN yum -y install centos-release-scl && \
-RUN  yum -y update && \
+RUN mkdir -p /input && mkdir -p /output && \
+    yum -y update && \
     yum -y upgrade && \
     yum -y install --setopt=tsflags=nodocs \
     automake \

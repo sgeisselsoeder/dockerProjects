@@ -1,4 +1,4 @@
-FROM km3net/km3base:20160909
+FROM km3net/km3base:20170318
 MAINTAINER Stefan Geisselsoeder <stefan.geisselsoeder@fau.de>
 
 # you can install DEFINED versions of required software here ...
