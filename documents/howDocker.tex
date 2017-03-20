@@ -255,6 +255,7 @@ is done using the command
 \begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 docker run -v `pwd`/externalOutput:/output my_analysis:v1
 \end{lstlisting}
+(Please note that you'll likely have to remove whitespaces if you copy-paste this command.)
 For testing or debugging purposes it is also possible to run interactively:
 \begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
 docker run -it --entrypoint /bin/bash my_analysis:v1

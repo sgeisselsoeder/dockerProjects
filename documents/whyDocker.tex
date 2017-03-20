@@ -21,7 +21,7 @@
 
 \begin{document}
 
-\title{Evaluation of Docker to enhance reproducibility of analyses for ASTERICS}
+\title{Evaluation of lightweight virtualization using Docker in the context of ASTERICS to enhance reproducibility of analyses}
 \author{Stefan Geißelsöder\\
 ECAP, Erlangen}
 \date{\today}
@@ -44,37 +44,43 @@ e.g. when the original creator has left a collaboration, or when a new person is
 Why do we recommend Docker instead of another technology for experiments in ASTERICS? 
 Here are a few considerations of alternatives. 
 
+
 \subsection{Plain scripts}
 
-Just plainly executing custom scripts on a machine in its currently available state 
+Plainly executing custom scripts on a machine in its currently available state 
 risks not to be able to reproduce the computation and results with updated hard/software. 
+This does not constitute an acceptable solution. 
 
 
 \subsection{Virtual machines}
 
-In principle virtual machines (VMS) are a reasonable idea to keep analyses reproducible. 
+In principle virtual machines (VMs) are a reasonable idea to keep analyses reproducible. 
 While there are different competing standards, most of the technologies are compatible with each other. 
-Without additional care, VMs can also decrease the efficiency of computations. 
-As this can be circumvented by some virtual machine techniques, this is not considered a major drawback here though. 
-The main problem is that the memory requirement of VMs doesn't scale well for a large number of analyses, 
+Without additional care, VMs can decrease the efficiency of computations \cite{ieee:vmperformance}, but  
+as the effect is not too big for our application 
+(and can be reduced by certain VM techniques \cite{xen:about, ieee:vmperformance}), 
+this is not considered a major drawback here. 
+The main problem with VMs for the envisioned application is that the memory requirement doesn't 
+scale good enough for a large number of analyses, 
 since a whole virtual machine has to be stored for each analysis. 
 
 
 \subsection{Docker}
-% 31219 commit 1627 contrib % on 20170307
-Docker\footnote{\url{https://www.docker.com/}} is based on layered containerization. It allows direct access 
+Docker \cite{docker:about} is based on layered containerization. 
+It allows direct access 
 to the underlying kernel while abstracting the software dependencies. 
-Since only the changes to a common base system required by an analysis have to be stored, 
+Since only the changes to a common base system required by an analysis have to be stored for an analysis, 
 the main drawback of virtual machines in the envisioned application scenario is dealt with, 
 namely the large memory requirements to store analyses. 
-A drawback of the current status of Docker is a so called ``privilege escalation'', 
-which potentially allows users to perform actions on a system they otherwise wouldn't have the rights for. 
-This prevents many clusters from supporting Docker directly, but it is no major concern in our scenario. 
+A drawback of the current status of Docker is the danger of ``privilege escalation'', 
+which potentially allows users to perform actions on a machine they otherwise wouldn't have the rights to. 
+This is no relevant concern for the application to physics analyses, 
+but it prevents several clusters from supporting Docker directly. 
+Desktop and cloud systems on the other hand support Docker. 
 
 
 \subsection{Singularity}
-% 2048 commit 34 contrib
-Singularity\footnote{\url{http://singularity.lbl.gov/about}} is another recent
+Singularity \cite{singu:about} is another recent
 option that could help with reproducibility similar to Docker. 
 While it even deals with privilege escalations, 
 so far it is not available on Microsoft Windows operating systems which are used by some members of some collaborations. 
@@ -85,8 +91,7 @@ correlated with a longer support and compatibility of following technologies.}.
 
 
 \subsection{Nix}
-% 5075 commit 110 contrib
-Nix\footnote{\url{https://nixos.org/nix}} constitutes a recent development that could be suited to help keeping analyses reproducible. 
+Nix \cite{nix:about} also constitutes a development that could be suited to help keeping analyses reproducible. 
 However it focuses on an application and its dependencies. 
 While it offers an elegant way to deal with these dependencies, it does not (and is not intended to) deal with e.g. input files. 
 Furthermore it doesn't support Microsoft Windows and, 
@@ -94,10 +99,9 @@ judging from the current size of the Nix community, is also less widespread than
 
 
 \subsection{Others}
-% rkt % 5167 commit 177 contrib
 % flock none
-There are many other similar approaches 
-(e.g. rkt\footnote{\url{https://coreos.com/rkt}}, Flockport\footnote{\url{https://www.flockport.com}}, etc.), 
+There are many other, similar approaches 
+(e.g. rkt \cite{rkt:about}, Flockport \cite{flockport:about}), 
 but on the one hand, there is no essential feature lacking in Docker that would be required 
 for our use-case. 
 On the other hand, to achieve a long-term reproducibility, which is key to us, 
@@ -110,11 +114,9 @@ Furthermore, many alternatives also support Docker images or Dockerfiles, while 
 
 Table \ref{tab:summary} is a summary of the comparison with perceived most relevant disadvantages in red.  
 While it should be clear at this point that there is no single perfect solution, 
-Docker seems to be the best choice as it does solve the problem of reproducibility, 
-is relatively easy to use\footnote{see e.g. ``Using Docker for your analysis in KM3NeT'', Stefan Geißelsöder, 2017}
-and doesn't have major drawbacks as far as the investigated use-case, the reproducibility of analyses, is concerned. 
-
-% \definecolor{darkgreen}{RGB}{20, 110, 20}
+Docker seems to be the best choice. It does solve the problem of reproducibility of physics analyses, 
+is relatively easy to use \cite{km3net:howdocker} 
+and doesn't have major drawbacks as far as the investigated use-case is concerned. 
 
 \begin{center}
 \begin{tabular}{ l | c | c | c | c | c }
@@ -125,12 +127,33 @@ and doesn't have major drawbacks as far as the investigated use-case, the reprod
   \hline
   All OS & Yes 	& Yes 	& Yes		& \textcolor{red}{No}	& \textcolor{red}{No} \\
   \hline
-  Widespread & Yes & Yes & Yes & No & No \\
+  Widespread* & Yes & Yes & Yes & No & No \\
   \hline
   Efficient & Yes & Possible & Yes & Yes & Yes \\
   \hline
   Storage required & Low & \textcolor{red}{High} & Moderate & Low & Moderate \\
 \end{tabular}
 \end{center}
+\bigskip
+\begin{center}
+*Community for different lightweight techniques on github.com, \\ state as of 2017-03-07 \\
+\bigskip
+\begin{tabular}{ l | c | c }
+\label{tab:popularity}
+      & Commits	& Contributors \\
+  \hline
+  Docker & 31219 & 1627 \\
+  \hline
+  Nix & 2048 & 34 \\
+  \hline
+  Singularity & 5075 & 110 \\
+  \hline
+  rkt & 5167 & 177 \\
+  \hline
+\end{tabular} \\
+\end{center}
+
+\bibliography{dockerRefs}
+\bibliographystyle{alpha}
 
 \end{document}
