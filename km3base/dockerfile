@@ -30,8 +30,6 @@ RUN mkdir -p /input && mkdir -p /output && \
     gcc-gfortran \ 
     openssl-devel \ 
     pcre-devel \ 
-    python-numpy-devel \
-    gsl-static \
     libX11-devel libXpm-devel libXft-devel libXext-devel \
     make gcc gcc-c++ gcc-gfortran \
     cmake zlib-devel\
@@ -41,16 +39,22 @@ RUN mkdir -p /input && mkdir -p /output && \
     python-devel \
     docutils python-nose \
     python-docutils \
-    hdf5 hdf5-devel \
     lzo-devel \ 
-    lbzip2 bzip2-devel blosc blosc-devel \
+    bzip2-devel \
+    tkinter \
+    csh ghostscript ant bison bzip2-devel \
+    fftw-devel flex flex-devel gcc gcc-c++ gcc-gfortran gdb git glibc-static gtk2-devel gzip \
+    libgpg-error libproxy libX11 libX11-common libX11-devel libXext libXext-devel \
+    libXft libXft-devel libXpm libXpm-devel make openssh-server pakchois \
+    python-devel subversion tar vim wget zsh \
     && yum -y remove python-setuptools && \ 
     curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" && \ 
     python get-pip.py && rm get-pip.py && \
-    pip install cython numpy h5py setuptools && \
+    pip install cython numpy h5py setuptools scipy tables matplotlib && \
     pip install km3pipe && \
     yum -y clean all 
-#    devtoolset-4-gcc* \
+# devtoolset-4-gcc* \
+# python-numpy-devel gsl-static hdf5 hdf5-devel lbzip2 blosc blosc-devel openjdk-8-jdk CLBSwissKnife cmake28 compat-gcc-34-g77
 
 # let's go for ROOT
 RUN mkdir /tmp/root -p && cd /tmp/root/ && \
@@ -71,14 +75,9 @@ ENV SHLIB_PATH /usr/local/lib/root
 
 # Install jpp
 COPY externalResources/JDAQUTCExtended.hh /
-RUN yum -y install --setopt=tsflags=nodocs csh openjdk-8-jdk ghostscript ant bison bzip2-devel CLBSwissKnife cmake28 compat-gcc-34-g77 fftw-devel flex flex-devel gcc gcc-c++ gcc-gfortran gdb git glibc-static gtk2-devel gzip libgpg-error libproxy libX11 libX11-common libX11-devel libXext libXext-devel libXft libXft-devel libXpm libXpm-devel make openssh-server pakchois python-devel subversion tar vim wget zsh && yum -y clean all
-# km3boost km3mono
-
-# RUN svn checkout --non-interactive --no-auth-cache --username km3net --password default-km3net-pw http://svn.km3net.de/Jpp/trunk /jpp && \
 RUN svn checkout --non-interactive --no-auth-cache --username km3net --password pyrosoma http://svn.km3net.de/Jpp/tag/v7.1.6632/ /jpp && \
     mv /JDAQUTCExtended.hh /jpp/software/JDAQ/JDAQUTCExtended.hh && \
     cd /jpp && source ./setenv.sh && make -j 2 ; make -j 2 ; make -j 2 ; make Antares ; make KM3NeT ; make libs
-# make DAQ not working, not sure if needed
 
 # (sic!)
 ENV AANET_DIR /jpp/externals/aanet/
