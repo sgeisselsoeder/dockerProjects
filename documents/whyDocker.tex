@@ -110,13 +110,18 @@ The current status is that this is fulfilled best by Docker.
 Furthermore, many alternatives also support Docker images or Dockerfiles, while their extensions usually are incompatible to others. 
 
 
-\subsection{Summary}
+\section{Summary}
 
 Table \ref{tab:summary} is a summary of the comparison with perceived most relevant disadvantages in red.  
 While it should be clear at this point that there is no single perfect solution, 
 Docker seems to be the best choice. It does solve the problem of reproducibility of physics analyses, 
 is relatively easy to use \cite{km3net:howdocker} 
 and doesn't have major drawbacks as far as the investigated use-case is concerned. 
+
+As this lightweight virtualization technique promise significant benefits, 
+first efforts have already begun to employ Docker for KM3NeT \cite{github:dockerprojects}. 
+The same basic concepts for packaging an analysis with Docker that are being worked out with KM3NeT 
+(e.g. a common base image and a default input/output interface) can also be applied for other experiments.
 
 \begin{center}
 \begin{tabular}{ l | c | c | c | c | c }
