@@ -1,0 +1,12 @@
+FROM km3net/km3base:20170320
+MAINTAINER Stefan Geisselsoeder <stefan.geisselsoeder@fau.de>
+
+# you can install DEFINED versions of required software here ...
+# BUT DO NOT USE yum update, yum upgrade or yum install, pip install, etc. for non-fixed software version 
+# (please contact the maintainer of the base image for an updated version instead)
+
+COPY hostInput /input
+COPY convertRootToHdf5.sh /convertRootToHdf5.sh
+
+ENTRYPOINT ["/convertRootToHdf5.sh"]
+
