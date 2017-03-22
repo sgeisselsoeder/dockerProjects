@@ -138,8 +138,11 @@ specifically extended to provide software typically required for analyses in KM3
 ''km3net`` denotes the name of the collaboration on Dockerhub\cite{dockerhub:km3net}
 ''km3base`` is the name of the base image used for analyses in KM3NeT and 
 ''20160909`` is the tag identifying which version of the base image is to be used. 
-The common tag ''latest`` is not used intentionally, as this could change the basis of the analysis unnoticed. 
-MAINTAINER is again a keyword, used to identify and contact the author. 
+You can see which versions are available at \url{https://hub.docker.com/r/km3net/km3base/tags/}. 
+It is recommended to use to most recent version of the base image. 
+The common tag ''latest`` isn't available (and may not be used), 
+as this could change the basis of an analysis unnoticed. 
+MAINTAINER is again a Docker keyword, used to identify and contact the author. 
 
 \label{sec:addingYourCode}
 To have the scripts, source code and input files for the analysis available in the Docker image, the keyword ''COPY`` is used.
