@@ -42,7 +42,7 @@ RUN mkdir -p /input && mkdir -p /output && \
     lzo-devel \ 
     bzip2-devel \
     tkinter \
-    csh ghostscript ant bison bzip2-devel \
+    csh ghostscript ant bison \
     fftw-devel flex flex-devel gcc gcc-c++ gcc-gfortran gdb git glibc-static gtk2-devel gzip \
     libgpg-error libproxy libX11 libX11-common libX11-devel libXext libXext-devel \
     libXft libXft-devel libXpm libXpm-devel make openssh-server pakchois \
