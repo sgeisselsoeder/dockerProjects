@@ -1,0 +1,9 @@
+A base image for analyses in KM3NeT. Derived from CentOS 7.
+
+Most importantly for KM3NeT data analyses it currently provides:
+- root
+- python
+- jpp
+- km3pipe
+
+See https://github.com/sgeisselsoeder/dockerProjects/blob/master/km3base/dockerfile for the Dockerfile.
