@@ -75,7 +75,7 @@ ENV SHLIB_PATH /usr/local/lib/root
 
 # Install jpp
 COPY externalResources/JDAQUTCExtended.hh /
-RUN svn checkout --non-interactive --no-auth-cache --username km3net --password pyrosoma http://svn.km3net.de/Jpp/tag/v7.1.6632/ /jpp && \
+RUN svn checkout --non-interactive --no-auth-cache --username km3net --password *enter-password-here* http://svn.km3net.de/Jpp/tag/v7.1.6632/ /jpp && \
     mv /JDAQUTCExtended.hh /jpp/software/JDAQ/JDAQUTCExtended.hh && \
     cd /jpp && source ./setenv.sh && make -j 2 ; make -j 2 ; make -j 2 ; make Antares ; make KM3NeT ; make libs
 
