@@ -12,8 +12,7 @@
 documents/*.log
 documents/*.pdf
 km3base/logs/*.log
-toyExample/output/*
 */bin/*
 *.o
-*/externalOutput/*.txt
-*/externalOutput/*.pdf
+*/hostOutput/*.txt
+*/hostOutput/*.pdf
