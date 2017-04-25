@@ -12,7 +12,7 @@ MAINTAINER Stefan Geisselsoeder <stefan.geisselsoeder@fau.de>
 # RUN yum -y install boost-1.53.0 && yum clean all
 
 COPY myAnalysis /myAnalysis 
-COPY externalInput /input
+COPY hostInput /input
 COPY runMyAnalysis.sh /runMyAnalysis.sh
 
 RUN make -C /myAnalysis
