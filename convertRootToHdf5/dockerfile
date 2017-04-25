@@ -7,6 +7,7 @@ MAINTAINER Stefan Geisselsoeder <stefan.geisselsoeder@fau.de>
 
 COPY hostInput /input
 COPY convertRootToHdf5.sh /convertRootToHdf5.sh
+RUN chmod 755 /convertRootToHdf5.sh
 
 ENTRYPOINT ["/convertRootToHdf5.sh"]
 
