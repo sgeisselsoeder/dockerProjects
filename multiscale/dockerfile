@@ -7,11 +7,12 @@ MAINTAINER Stefan Geisselsoeder <stefan.geisselsoeder@fau.de>
 
 RUN yum install -y gnuplot-4.6.2 boost-devel-1.53.0 && yum -y clean all
 
-RUN git clone https://github.com/sgeisselsoeder/multiscale.git /multiscale
+# If you can specify a unique identifier you may also get your source dynamically. 
+RUN git clone https://github.com/sgeisselsoeder/multiscale.git /multiscale && cd /multiscale && git reset --hard d5a95898a6515132e380c5b6806c4f212d18cb0d
 RUN make -C /multiscale
 
-# For this analysis demo we will either mount the input or have a default setup be created on the fly
-# COPY externalInput /input
+# For this analysis demo we will either mount the input or have a default setup be created on the fly, so we don't need to copy input here
+# COPY hostInput /input
 
 COPY runMultiscaleAnalysis.sh /runMultiscaleAnalysis.sh
 RUN chmod 755 runMultiscaleAnalysis.sh
