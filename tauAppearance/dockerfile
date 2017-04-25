@@ -9,7 +9,7 @@ MAINTAINER Steffen Hallmann <steffen.hallmann@fau.de>
 ### copy files for analysis
 ENV ANALYSISDIR /tauAppearanceToyAnalysis
 COPY tauAppearanceToyAnalysis $ANALYSISDIR
-COPY externalInput /input
+COPY hostInput /input
 COPY runTauAppearanceToyAnalysis.sh /runTauAppearanceToyAnalysis.sh
 RUN chmod 755 /runTauAppearanceToyAnalysis.sh
 
