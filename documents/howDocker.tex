@@ -104,10 +104,10 @@ sudo service docker restart
 \subsection{A toy example}
 \label{sec:toyexample}
 Everything required for our example is located in the folder toyExample. 
-Within toyExample there is a folder named externalInput which contains the prefiltered input files, 
+Within toyExample there is a folder named hostInput which contains the prefiltered input files, 
 a folder named myAnalysis which contains the required source code, Makefiles, scripts, etc., 
-a folder externalOutput where the output of the analysis will be stored, 
-a script called runMyAnalysis.sh that will execute the analysis and a file called Dockerfile. 
+a folder hostOutput where the output of the analysis will be stored, 
+a script called runMyAnalysis.sh that will execute the analysis and a file called dockerfile. 
 
 \subsubsection{The Dockerfile}
 \label{sec:dockerfile}
@@ -122,7 +122,7 @@ FROM km3net/km3base:20160909
 MAINTAINER S. Geisselsoeder <stefan.geisselsoeder@fau.de>
 
 COPY myAnalysis /myAnalysis
-COPY externalInput /input
+COPY hostInput /input
 COPY runMyAnalysis.sh /runMyAnalysis.sh
 
 RUN make -C /myAnalysis
@@ -155,7 +155,7 @@ It contains the source code of the toy example.
 The destination /myAnalysis specifies where the folder will be available when the Docker container is run. 
 The same is done for the input files by
 \begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
-COPY externalInput /input 
+COPY hostInput /input 
 \end{lstlisting}
 and for the script ''runMyAnalysis.sh`` that will be used to execute the example. 
 \begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
@@ -256,7 +256,7 @@ Actually running the example in a Docker container\footnote{The object running t
 One could think of it as being slightly similar to a binary file (image) and the process running it (container).} 
 is done using the command 
 \begin{lstlisting}[basicstyle=\ttfamily\small,upquote=true,columns=flexible,keepspaces=true,frame=single]
-docker run -v `pwd`/externalOutput:/output my_analysis:v1
+docker run -v `pwd`/hostOutput:/output my_analysis:v1
 \end{lstlisting}
 (Please note that you'll likely have to remove whitespaces if you copy-paste this command.)
 For testing or debugging purposes it is also possible to run interactively:
@@ -268,13 +268,13 @@ would be enough to run the example, the output is stored in folder
 ''/output/`` as specified in Section \ref{sec:runmyanalysis}.
 Without any further options this folder lives within the Docker container, but is not accessible from the outside. 
 Therefore the option -v can be used to mount a folder from the host system to a folder in the container. 
-With ''-v `pwd`/externalOutput:/output``, all files that are written within the container to /output 
-are actually stored to the folder ./externalOutput on the host system. 
-We write `pwd`/externalOutput instead of ./externalOutput because the 
+With ''-v `pwd`/hostOutput:/output``, all files that are written within the container to /output 
+are actually stored to the folder ./hostOutput on the host system. 
+We write `pwd`/hostOutput instead of ./hostOutput because the 
 paths may not be relative but have to be absolute when using the option -v. 
 
 When we run the Docker container, we see the output that would be printed when 
-executing the script runMyAnalysis.sh directly, and afterwards the output is found in folder ./externalOutput. 
+executing the script runMyAnalysis.sh directly, and afterwards the output is found in folder ./hostOutput. 
 It should be noted that no changes made to the container by the execution of our analysis 
 are stored to any image. 
 Therefore all desired output has to end up in the designated output folder (or another mounted volume). 
@@ -439,7 +439,7 @@ and the collaboration (reliable reproducibility).
 git clone https://github.com/sgeisselsoeder/dockerProjects.git temp
 cd temp/toyExample
 docker build -t my_analysis:v1 .
-docker run -v `pwd`/externalOutput:/output my_analysis:v1
+docker run -v `pwd`/hostOutput:/output my_analysis:v1
 \end{lstlisting}
 
 
