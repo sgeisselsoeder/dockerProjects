@@ -16,3 +16,10 @@ km3base/logs/*.log
 *.o
 */hostOutput/*.txt
 */hostOutput/*.pdf
+convertRootToHdf5
+jpp-docker
+K40_fit
+
+
+
+
