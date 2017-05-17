@@ -1,0 +1,8 @@
+#!/bin/bash
+DATETAG=`date +%Y%m%d`
+mkdir logs
+LOGFILE=logs/build${DATETAG}`date +%H%M%S`.log
+IMAGENAME=seatray
+echo "creating base image ${IMAGENAME}:${DATETAG}"
+docker build -t km3net/${IMAGENAME}:${DATETAG} . 2>&1 | tee ${LOGFILE} 
+# REMINDER: Don't use the tag latest here as derived images might change unnoticed if they use :latest

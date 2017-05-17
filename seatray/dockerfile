@@ -46,43 +46,27 @@ RUN mkdir -p /input && mkdir -p /output && \
     fftw-devel flex flex-devel gcc gcc-c++ gcc-gfortran gdb git glibc-static gtk2-devel gzip \
     libgpg-error libproxy libX11 libX11-common libX11-devel libXext libXext-devel \
     libXft libXft-devel libXpm libXpm-devel make openssh-server pakchois \
-    python-devel subversion tar vim wget zsh 
+    python-devel subversion tar vim wget zsh \
+    tcl-devel ncurses-devel \
+    uuid-devel uuid-c++.x86_64 uuid-c++-devel.x86_64 libuuid-devel.x86_64 pkgconfig libtool gcc-c++ libuuid-devel \
+    xorg-x11-server-devel \
+    scipy numpy
 
-RUN yum install -y tcl-devel 
-# RUN yum groupinstall -y "X Software Development" 
-RUN yum groupinstall -y "X Window System" 
-RUN yum groupinstall -y "CERN Addons X11" 
-RUN yum install -y xorg-x11-server-devel
 RUN yum groupinstall -y "Desktop Platform Development"
 
-# RUN yum -y install x11vnc firefox xorg-x11-fonts* xorg-x11-xinit xorg-x11-xinit-session xorg-x11-server-Xvfb xorg-x11-twm tigervnc-server xterm xorg-x11-font
-
-RUN svn checkout --non-interactive --no-auth-cache --username km3net --password default-km3net-read-pw http://svn.km3net.physik.uni-erlangen.de/tools/DarwinPorts/trunk ~/port_source 
-# RUN mkdir /i3ports
-RUN yum install -y ncurses-devel
-
-RUN yum install -y uuid-devel uuid-c++.x86_64 uuid-c++-devel.x86_64 libuuid-devel.x86_64 pkgconfig libtool gcc-c++ libuuid-devel
-
 COPY hotfixes /hotfixes
-RUN cp /hotfixes/i3-install.sh /root/port_source/ && chmod 755 /root/port_source/i3-install.sh
-
-
-# vim /i3ports/var/db/dports/sources/rsync.code.km3net.physik.uni-erlangen.de_icetray-tools-ports/science/igraph_0.5.4/Portfile
-# https://downloads.sourceforge.net/project/igraph/C%20library/0.5.4/igraph-0.5.4.tar.gz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Figraph%2Ffiles%2FC%2520library%2F0.5.4%2F&ts=1494922614&use_mirror=netcologne
-# cd /i3ports
-# ./bin/port install i3-tools-km3net-v4
-RUN ls /hotfixes && env && cd ~/port_source && export I3_PORTS=/i3ports && env ./i3-install.sh $I3_PORTS && env
-
 ENV I3_PORTS /i3ports
 
-RUN yum install -y scipy numpy
+# I3_PORTS
+RUN svn checkout --non-interactive --no-auth-cache --username km3net --password common-read-pw \ 
+    http://svn.km3net.physik.uni-erlangen.de/tools/DarwinPorts/trunk ~/port_source && \
+    cp /hotfixes/i3-install.sh /root/port_source/ && chmod 755 /root/port_source/i3-install.sh && \
+    cd ~/port_source && ./i3-install.sh /i3ports 
 
-RUN env && mkdir /seatray && cd /seatray && svn checkout --non-interactive --no-auth-cache --username km3net --password default-km3net-read-pw http://svn.km3net.physik.uni-erlangen.de/icetray/meta-projects/searec/trunk src && mkdir build
-RUN cd /seatray && mv src/grb-shower . && mv src/antares-tantra-reco . && mv src/antares-antdst-writer . 
-
-#RUN cd /seatray/build && pwd && ${I3_PORTS}/bin/cmake ../src
-RUN cd /seatray/build && pwd && ${I3_PORTS}/bin/cmake -DCMAKE_BUILD_TYPE:STRING=Debug ../src
-
-RUN cd /seatray/build && make
+# SEATRAY
+RUN mkdir /seatray && cd /seatray && svn checkout --non-interactive --no-auth-cache --username km3net --password common-read-pw \
+    http://svn.km3net.physik.uni-erlangen.de/icetray/meta-projects/searec/trunk src && mkdir build && \
+    mv src/grb-shower . && mv src/antares-tantra-reco . && mv src/antares-antdst-writer . && \ 
+    cd build && ${I3_PORTS}/bin/cmake -DCMAKE_BUILD_TYPE:STRING=Release ../src && make
 
 ENTRYPOINT ["/bin/bash"]
