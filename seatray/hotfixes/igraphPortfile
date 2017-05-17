@@ -1,0 +1,49 @@
+# $Id$
+
+PortSystem 1.0
+
+set barename            igraph
+version                 0.5.4
+name                    ${barename}_${version}
+revision                2
+
+description             software package for creating and manipulating undirected and directed graphs
+
+long_description        igraph is a free software package for creating and manipulating undirected and \
+                        directed graphs. It includes implementations for classic graph theory problems \
+                        like minimum spanning trees and network flow, and also implements algorithms for \
+                        some recent network analysis methods, like community structure search.
+
+maintainers             claudio.kopper@nikhef.nl
+categories              science
+platforms               darwin linux
+homepage                http://igraph.sourceforge.net/
+#master_sites            http://switch.dl.sourceforge.net/sourceforge/igraph/
+master_sites            https://downloads.sourceforge.net/project/igraph/C%20library/0.5.4/igraph-0.5.4.tar.gz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Figraph%2Ffiles%2FC%2520library%2F0.5.4%2F&ts=1494922614&use_mirror=netcologne
+distname                ${barename}-${version}
+
+checksums               md5     47963ece64fe5f793e154e238bc6c3c3 \
+                        sha1    e5f1a54ac1a9567127ebee838720b3ec38ad534a
+
+#depends_lib             port:gmp_4.3.2
+#
+#configure.env           CFLAGS=-I${prefix}/include/gmp-4.3.2/gmp \
+#                        LDFLAGS=-L${prefix}/lib/gmp-4.3.2
+
+configure.args          --disable-gmp \
+                        --disable-graphml \
+                        --prefix=${prefix} \
+                        --includedir=${prefix}/include/${barename} \
+                        --libdir=${prefix}/lib/${distname}
+# --includedir should have been ${prefix}/include/${distname}/${barename}
+# This, however, seems to be ignored by the configure script and
+# gets set to ${prefix}/include/igraph. So set it to this value and
+# move it later..
+
+patchfiles          src_DensityGrid_llvm_segfault.patch
+
+
+post-destroot {
+    file mkdir ${destroot}${prefix}/include/${distname}
+    catch { file rename ${destroot}${prefix}/include/${barename} ${destroot}${prefix}/include/${distname}/${barename} }
+}
