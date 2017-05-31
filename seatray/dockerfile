@@ -50,9 +50,10 @@ RUN mkdir -p /input && mkdir -p /output && \
     tcl-devel ncurses-devel \
     uuid-devel uuid-c++.x86_64 uuid-c++-devel.x86_64 libuuid-devel.x86_64 pkgconfig libtool gcc-c++ libuuid-devel \
     xorg-x11-server-devel \
-    scipy numpy
-
-RUN yum groupinstall -y "Desktop Platform Development"
+    scipy numpy \
+    libaio libaio-devel && \
+    yum groupinstall -y "Desktop Platform Development" && \
+    yum clean all
 
 COPY hotfixes /hotfixes
 ENV I3_PORTS /i3ports
