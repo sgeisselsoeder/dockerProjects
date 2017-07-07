@@ -59,15 +59,20 @@ COPY hotfixes /hotfixes
 ENV I3_PORTS /i3ports
 
 # I3_PORTS
-RUN svn checkout --non-interactive --no-auth-cache --username km3net --password common-read-pw \ 
+RUN svn checkout --non-interactive --no-auth-cache --username km3net --password km3netReadPassword \ 
     http://svn.km3net.physik.uni-erlangen.de/tools/DarwinPorts/trunk ~/port_source && \
     cp /hotfixes/i3-install.sh /root/port_source/ && chmod 755 /root/port_source/i3-install.sh && \
     cd ~/port_source && ./i3-install.sh /i3ports 
 
 # SEATRAY
-RUN mkdir /seatray && cd /seatray && svn checkout --non-interactive --no-auth-cache --username km3net --password common-read-pw \
+RUN mkdir /seatray && cd /seatray && svn checkout --non-interactive --no-auth-cache --username km3net --password km3netReadPassword \
     http://svn.km3net.physik.uni-erlangen.de/icetray/meta-projects/searec/trunk src && mkdir build && \
     mv src/grb-shower . && mv src/antares-tantra-reco . && mv src/antares-antdst-writer . && \ 
     cd build && ${I3_PORTS}/bin/cmake -DCMAKE_BUILD_TYPE:STRING=Release ../src && make
+
+RUN yum -y install python-matplotlib pygtk2 pygtk2-devel
+
+COPY aafit /i3ports/aafit
+
 
 ENTRYPOINT ["/bin/bash"]
