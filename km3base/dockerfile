@@ -2,11 +2,15 @@ FROM centos:latest
 
 MAINTAINER Stefan Geißelsöder <stefan.geisselsoeder@fau.de>
 
+# took out the update part by default
+# a) to see if the image will be smaller
+# b) as new software can be included by using a new version of centos and having a fixed tag and no updates provides a 100 percent stable versioning.
+#    yum -y update && \
+#    yum -y upgrade && \
+
 # everything is in one command to avoid itnermediate layers (saves space)
 #RUN yum -y install centos-release-scl && \
 RUN mkdir -p /input && mkdir -p /output && \
-    yum -y update && \
-    yum -y upgrade && \
     yum -y install --setopt=tsflags=nodocs \
     automake \
     autoconf \
